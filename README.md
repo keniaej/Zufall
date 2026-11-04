@@ -38,27 +38,55 @@ Die vollständige Aufgabenstellung steht in [docs/projekt.md](docs/projekt.md), 
 
 Neue Plattform anbinden: `agent/quellen/vorlage.py` kopieren und in `agent/quellen/__init__.py` eintragen.
 
-## Ordner
+## Ordner und Dateien
 
-```
-Zufall/
-├── agent/                 Der eigentliche Code (eine Datei pro Teil)
-│   ├── konfiguration.py   TEIL 1: Was gesucht wird (CPV-Codes, Region, Schlagwörter)
-│   ├── format.py          TEIL 2: Welche Spalten jede Quelle liefern muss
-│   ├── quellen/           TEIL 3: Eine Datei pro Plattform
-│   ├── pruefungen.py      TEIL 4: CPV, Region, Fristen, Schlagwörter, Dubletten
-│   ├── ki_bewertung.py    OFFEN: KI-Bewertung
-│   ├── excel_export.py    Schreibt die Excel-Datei
-│   └── main.py            TEIL 5: Ablauf, hier läuft alles zusammen
-├── notebooks/             Unser ursprüngliches Notebook (Stand 04.11.2026) und zum Ausprobieren
-├── dashboard/             OFFEN: Power-BI-Dashboard
-├── automatisch/           Agent einmal im Monat automatisch starten
-├── docs/                  Aufgabenstellung, offene Punkte
-├── tests/                 Kleine Tests der Regeln
-└── output/                Hier landen die Excel-Dateien (nicht in Git)
-```
+Die Spalte **Herkunft** zeigt, woher der Inhalt kommt:
+- **Notebook:** unser Code aus `TED_API.ipynb`, nur in eine eigene Datei verschoben
+- **neu:** später dazugekommen
 
-Die Teile 1 bis 5 sind dieselben wie in unserem Notebook, nur jeweils in einer eigenen Datei. So können mehrere Leute gleichzeitig an verschiedenen Teilen arbeiten, ohne sich gegenseitig zu überschreiben.
+### `agent/`: der eigentliche Code
+
+Der Agent wird mit `python -m agent.main` gestartet. `main.py` ruft die anderen Dateien der Reihe nach auf.
+
+| Datei | Was sie macht | Herkunft |
+|-------|---------------|----------|
+| `konfiguration.py` | **TEIL 1.** Alle Einstellungen: Startdatum, Land, CPV-Codes pro ZUFALL-Produkt, Landkreise für den Landverkehr, Ausschluss-Schlagwörter. Wer etwas an den Kriterien ändern will, ändert es nur hier. | Notebook |
+| `format.py` | **TEIL 2.** Legt fest, welche Spalten jede Plattform liefern muss (z. B. Titel, Frist, CPV), damit alle Plattformen gleich weiterverarbeitet werden können. Dazu kleine Hilfsfunktionen, z. B. Datum umwandeln. | Notebook |
+| `quellen/ted.py` | **TEIL 3.** Ruft die Ausschreibungen von TED ab und bringt sie ins gemeinsame Format. | Notebook |
+| `quellen/oeffentlichevergabe.py` | **TEIL 3.** Ruft die Ausschreibungen von öffentlichevergabe.de ab (CSV- und XML-Dateien) und bringt sie ins gemeinsame Format. | Notebook |
+| `quellen/__init__.py` | Liste aller Plattformen, die der Agent abfragt. Neue Plattform = hier eintragen. | Notebook |
+| `quellen/vorlage.py` | Leere Vorlage zum Kopieren, wenn eine neue Plattform dazukommt (z. B. Service.Bund). Wird nicht ausgeführt. | neu |
+| `pruefungen.py` | **TEIL 4.** Die festen Filter: CPV-Codes, Region, Fristen, Schlagwörter und Dubletten. Alles Aussortierte bekommt einen Grund. | Notebook |
+| `ki_bewertung.py` | **Platzhalter** für den KI-Filter. Macht noch nichts, außer die Meldung „noch nicht gebaut“ auszugeben. Hier kommt die KI-Bewertung hin. | neu |
+| `excel_export.py` | Schreibt das Ergebnis in `output/ausschreibungen.xlsx` mit den Blättern *Relevant*, *Aussortiert* und *Status*. Überschreibt die Datei bei jedem Lauf. | neu |
+| `main.py` | **TEIL 5.** Der Ablauf: Plattformen abrufen → Dubletten → Prüfungen → KI-Bewertung → Excel. | Notebook, am Ende um KI-Bewertung und Excel ergänzt |
+| `__init__.py` | Leere Datei. Python braucht sie, damit es den Ordner `agent` als zusammengehörigen Code erkennt. Nicht löschen. | neu |
+
+### Weitere Ordner
+
+| Ordner / Datei | Was es ist | Herkunft |
+|----------------|------------|----------|
+| `notebooks/TED_API.ipynb` | Unser ursprüngliches Notebook, unverändert (Stand 04.11.2026). Zum Nachschauen und Ausprobieren. Der Agent selbst nutzt es nicht. | Notebook |
+| `automatisch/README.md` | Anleitung, wie der Agent einmal im Monat von selbst läuft (Mac und Windows). | neu |
+| `automatisch/einrichten_mac.sh` | Schaltet auf dem Mac den monatlichen Lauf ein. Einmal starten mit `bash automatisch/einrichten_mac.sh`. | neu |
+| `automatisch/ausschalten_mac.sh` | Schaltet den monatlichen Lauf auf dem Mac wieder aus. | neu |
+| `dashboard/README.md` | **Platzhalter** für das Power-BI-Dashboard, mit den Fragen, die wir noch klären müssen. | neu |
+| `docs/projekt.md` | Aufgabenstellung und unsere geplante Pipeline. | neu |
+| `docs/offene_fragen.md` | Checkliste aller offenen Punkte (Team und Fragen an ZUFALL). | neu |
+| `tests/test_pruefungen.py` | Drei kleine Tests, ob die Regeln richtig rechnen (z. B. ob ein Schlagwort aussortiert wird). Starten mit `python -m pytest`. Braucht kein Internet. | neu |
+| `output/` | Hier landen `ausschreibungen.xlsx` und `log.txt` (Protokoll des automatischen Laufs). Beides wird **nicht** zu GitHub hochgeladen, es liegt nur auf eurem Rechner. | neu |
+
+### Dateien im Hauptordner
+
+| Datei | Was sie macht |
+|-------|---------------|
+| `README.md` | Diese Übersicht. |
+| `CONTRIBUTING.md` | Anleitung, wie wir mit Git zusammenarbeiten (Branches, Pull Requests). |
+| `requirements.txt` | Liste der Python-Pakete. `pip install -r requirements.txt` installiert sie alle. |
+| `.env.example` | Vorlage für API-Keys. Kopieren, in `.env` umbenennen und Keys eintragen. Wird erst für die KI gebraucht. |
+| `.gitignore` | Liste der Dateien, die Git **nie** hochlädt: `.env` mit den Keys, Excel-Dateien, die Python-Umgebung `.venv`. |
+
+Die Dateien mit einem Punkt am Anfang (`.env.example`, `.gitignore`) sind auf dem Mac im Finder versteckt. In VS Code sieht man sie normal.
 
 ## Einrichtung (einmalig pro Person)
 
