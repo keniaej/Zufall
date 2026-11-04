@@ -1,24 +1,52 @@
-# Ausschreibungs-Agent
+# Ausschreibungs-Agent (ZUFALL logistics group)
 
-Ein KI-Agent, der über die APIs von Ausschreibungsportalen aktuelle Ausschreibungen abruft und in einer Excel-Datei sammelt.
+Ein Agent, der öffentliche Ausschreibungen sammelt, nach ZUFALLs Kriterien filtert, mit KI bewertet und in einem BI-Dashboard anzeigt.
 
-## Projektstruktur
+## Der Ablauf und wo wir stehen
+
+```
+1. Abrufen      →  2. Prüfen      →  3. Excel       →  4. KI-Bewertung  →  5. Dashboard
+   TED,              CPV, Region,      Relevant +        passt es zu        BI-Dashboard
+   öffentliche-      Fristen,          Aussortiert       ZUFALL?            für ZUFALL
+   vergabe.de        Schlagwörter
+   ✅ fertig          ✅ fertig          🟡 erste Version   ⬜ offen            ⬜ offen
+```
+
+| Schritt | Datei | Stand |
+|---------|-------|-------|
+| Konfiguration (was gesucht wird) | `agent/konfiguration.py` | ✅ fertig, einige Fragen an ZUFALL offen |
+| Gemeinsames Format (welche Spalten) | `agent/format.py` | ✅ fertig |
+| 1. Quelle TED | `agent/quellen/ted.py` | ✅ funktioniert |
+| 1. Quelle öffentlichevergabe.de | `agent/quellen/oeffentlichevergabe.py` | 🟡 gebaut, im letzten Test Timeout |
+| 1. Weitere Quellen | `agent/quellen/vorlage.py` | ⬜ Vorlage vorhanden |
+| 2. Prüfungen und Dubletten | `agent/pruefungen.py` | ✅ fertig |
+| 3. Excel-Export | `agent/excel_export.py` | 🟡 einfache erste Version |
+| 4. KI-Bewertung | `agent/ki_bewertung.py` | ⬜ offen |
+| 5. Dashboard | `dashboard/` | ⬜ offen |
+| Ablauf (alles zusammen) | `agent/main.py` | ✅ fertig |
+
+Offene Fragen an ZUFALL und im Team stehen in [docs/offene_fragen.md](docs/offene_fragen.md).
+
+## Ordner
 
 ```
 Zufall/
-├── src/ausschreibungs_agent/
-│   ├── main.py            # Startpunkt: holt Ausschreibungen und schreibt die Excel-Datei
-│   ├── config.py          # Liest API-Keys und Einstellungen aus der .env-Datei
-│   ├── excel_export.py    # Schreibt die Ergebnisse nach Excel
-│   └── quellen/           # Eine Datei pro Ausschreibungsportal
-│       └── beispiel_quelle.py
-├── tests/                 # Tests
-├── output/                # Hier landen die Excel-Dateien (nicht in Git)
-├── docs/                  # Notizen, Doku zu den APIs
-├── .env.example           # Vorlage für eure API-Keys
-├── requirements.txt       # Python-Pakete
-└── CONTRIBUTING.md        # So arbeiten wir im Team mit Git
+├── agent/                 Der eigentliche Code (eine Datei pro Teil)
+│   ├── konfiguration.py   TEIL 1: Was gesucht wird (CPV-Codes, Region, Schlagwörter)
+│   ├── format.py          TEIL 2: Welche Spalten jede Quelle liefern muss
+│   ├── quellen/           TEIL 3: Eine Datei pro Plattform
+│   ├── pruefungen.py      TEIL 4: CPV, Region, Fristen, Schlagwörter, Dubletten
+│   ├── excel_export.py    Schreibt die Excel-Datei
+│   ├── ki_bewertung.py    OFFEN: KI-Bewertung
+│   └── main.py            TEIL 5: Ablauf, hier läuft alles zusammen
+├── notebooks/             Unser ursprüngliches Notebook (Stand 04.11.2026) und zum Ausprobieren
+├── dashboard/             OFFEN: BI-Dashboard
+├── docs/                  Offene Fragen, Notizen
+├── tests/                 Kleine Tests der Regeln
+└── output/                Hier landen die Excel-Dateien (nicht in Git)
 ```
+
+Die Teile 1 bis 5 sind dieselben wie in unserem Notebook, nur jeweils in einer eigenen Datei. So können mehrere Leute gleichzeitig an verschiedenen Teilen arbeiten, ohne sich gegenseitig zu überschreiben.
 
 ## Einrichtung (einmalig pro Person)
 
@@ -38,33 +66,37 @@ source .venv/bin/activate
 
 # 3. Pakete installieren
 pip install -r requirements.txt
-
-# 4. API-Keys eintragen
-# .env.example kopieren und in .env umbenennen, dann die Keys eintragen
-cp .env.example .env
 ```
 
 ## Starten
 
+Immer aus dem Hauptordner `Zufall`:
+
 ```bash
-python -m src.ausschreibungs_agent.main
+python -m agent.main
 ```
 
-Die Excel-Datei erscheint danach im Ordner `output/`.
+Die Excel-Datei erscheint danach in `output/`.
 
-## Wichtig: API-Keys
+Tests (brauchen kein Internet):
 
-API-Keys gehören **nur** in die Datei `.env`. Diese Datei wird nie zu GitHub hochgeladen (sie steht in `.gitignore`). Teilt die Keys im Team über einen sicheren Weg, z. B. einen Passwort-Manager, aber niemals im Code oder im Chat des Repos.
+```bash
+python -m pytest
+```
 
-## Branches
+## Wo ändere ich was?
 
-| Branch | Wofür |
-|--------|-------|
-| `main` | Immer die funktionierende Version. Hier wird **nie direkt** gearbeitet, nur per Pull Request. |
-| `feature/...` | Ein Branch pro Aufgabe, z. B. `feature/quelle-ted`. Wird nach dem Merge gelöscht. |
-| `fix/...` | Für Fehlerbehebungen, z. B. `fix/datum-format`. |
+- **Andere CPV-Codes, Region oder Schlagwörter:** nur in `agent/konfiguration.py`
+- **Neue Plattform anbinden:** `agent/quellen/vorlage.py` kopieren und in `agent/quellen/__init__.py` eintragen
+- **Neue Prüfung:** Funktion in `agent/pruefungen.py` schreiben und unten in `PRUEFUNGEN` eintragen
 
-Wie das genau geht, steht in [CONTRIBUTING.md](CONTRIBUTING.md).
+## API-Keys
+
+API-Keys gehören **nur** in die Datei `.env` (Vorlage: `.env.example`). Diese Datei wird nie hochgeladen. Das Repo ist öffentlich, also **nie Keys in den Code schreiben**.
+
+## Zusammenarbeit
+
+Wie wir mit Branches und Pull Requests arbeiten, steht in [CONTRIBUTING.md](CONTRIBUTING.md). Kurz: Niemand arbeitet direkt auf `main`.
 
 ## Aufgaben
 
