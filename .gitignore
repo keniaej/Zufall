@@ -1,0 +1,23 @@
+# Geheimnisse – NIE hochladen
+.env
+*.key
+
+# Ergebnisse
+output/*
+!output/.gitkeep
+*.xlsx
+~$*.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Editor / Betriebssystem
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
