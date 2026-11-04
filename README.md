@@ -21,7 +21,8 @@ Die vollständige Aufgabenstellung steht in [docs/projekt.md](docs/projekt.md), 
 | 1. Abrufen der Plattformen | `agent/quellen/` | 🟡 siehe Plattform-Tabelle |
 | 1. Python-Filter und Dubletten | `agent/pruefungen.py` | ✅ fertig, Regeln für Dopplungen noch festlegen |
 | 2. KI-Bewertung | `agent/ki_bewertung.py` | ⬜ offen |
-| 2. Excel-Export | `agent/excel_export.py` | 🟡 einfache erste Version |
+| 2. Excel-Export | `agent/excel_export.py` | ✅ eine feste Datei `output/ausschreibungen.xlsx`, wird bei jedem Lauf aktualisiert |
+| Automatischer Lauf (einmal im Monat) | `automatisch/` | ✅ Anleitung und Skript für Mac, Anleitung für Windows |
 | 3. Power-BI-Dashboard | `dashboard/` | ⬜ offen |
 | Ablauf (alles zusammen) | `agent/main.py` | ✅ fertig |
 
@@ -51,6 +52,7 @@ Zufall/
 │   └── main.py            TEIL 5: Ablauf, hier läuft alles zusammen
 ├── notebooks/             Unser ursprüngliches Notebook (Stand 04.11.2026) und zum Ausprobieren
 ├── dashboard/             OFFEN: Power-BI-Dashboard
+├── automatisch/           Agent einmal im Monat automatisch starten
 ├── docs/                  Aufgabenstellung, offene Punkte
 ├── tests/                 Kleine Tests der Regeln
 └── output/                Hier landen die Excel-Dateien (nicht in Git)
@@ -86,7 +88,9 @@ Immer aus dem Hauptordner `Zufall` und **lokal auf eurem Rechner** (nicht über 
 python -m agent.main
 ```
 
-Die Excel-Datei erscheint danach in `output/`.
+Das Ergebnis steht danach in `output/ausschreibungen.xlsx`. Die Datei wird bei jedem Lauf mit dem aktuellen Stand überschrieben.
+
+Damit der Agent **automatisch einmal im Monat** läuft, siehe [automatisch/README.md](automatisch/README.md).
 
 Tests (brauchen kein Internet):
 
