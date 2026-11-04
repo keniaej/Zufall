@@ -18,20 +18,13 @@ Das Unternehmen hat sich auf den Weg gemacht, die Logistik nachhaltig achtsam zu
 ## Aufgabenstellung
 
 Entwicklung zweier KI-Agenten (je eine Projektgruppe):
-1. Sammeln öffentlicher Transportausschreibungen von unterschiedlichen Plattformen (bspw. TED, Service.Bund, NSPA etc.) sowie deren Qualifizierung. **← unsere Gruppe**
-2. Sammeln von Frachtpreisen von 3PL-Wettbewerbern und deren Darstellung in einem Cockpit/Dashboard für Benchmarking.
+1. Sammeln öffentlicher Transportausschreibungen von unterschiedlichen Plattformen (bspw. TED, Service.Bund, NSPA etc.) sowie deren Qualifizierung. 
 
 ## Erwartete Ergebnisse
 
 ### „Agent Öffentliche Ausschreibungen“ (unsere Gruppe)
 
 1. KI-Agent, der öffentliche Transport- und Lagerausschreibungen auf den Plattformen **TED, Service.Bund, NSPA (Nato), e-Vergabe, öffentlichevergabe.de** nach vordefinierten Kriterien sammelt
-2. Ein (Power BI) Dashboard/Cockpit zur Darstellung der gesammelten Ausschreibungen und deren Informationen
-
-### „Agent Wettbewerbspreise“ (andere Gruppe)
-
-1. KI-Agent, der Transportpreise, die über Websites (Schenker/DSV, Cargoboard) abrufbar sind, auf 10 vorgegebenen Relationen und 5 vorgegebenen Gewichten erfasst
-2. Ein (Power BI) Dashboard/Cockpit, das die gesammelten Preise der Wettbewerber darstellt und miteinander vergleicht
 
 ## Unsere geplante Pipeline
 
