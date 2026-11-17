@@ -1,0 +1,2 @@
+# Windows-Startdatei braucht Windows-Zeilenenden, auch wenn sie auf einem Mac bearbeitet wird
+*.bat text eol=crlf

@@ -109,15 +109,29 @@ Der `Agent` kennt keine einzelne Plattform und keine einzelne Regel. Er arbeitet
 
 | Datei | Was sie macht |
 |-------|---------------|
+| `Agent starten.bat` | **Start unter Windows per Doppelklick.** Richtet beim ersten Mal alles ein, startet den Agenten, schreibt `output/log.txt`. |
 | `README.md` | Diese Übersicht. |
 | `CONTRIBUTING.md` | Anleitung, wie wir mit Git zusammenarbeiten (Branches, Pull Requests). |
 | `requirements.txt` | Liste der Python-Pakete. `pip install -r requirements.txt` installiert sie alle. |
 | `.env.example` | Vorlage für API-Keys. Kopieren, in `.env` umbenennen und Keys eintragen. Aktuell braucht keine Plattform einen Key. |
 | `.gitignore` | Liste der Dateien, die Git **nie** hochlädt: `.env` mit den Keys, Excel-Dateien, die Python-Umgebung `.venv`. |
+| `.gitattributes` | Sorgt dafür, dass `Agent starten.bat` immer Windows-Zeilenenden hat (sonst funktioniert sie nicht). |
 
 Die Dateien mit einem Punkt am Anfang (`.env.example`, `.gitignore`) sind auf dem Mac im Finder versteckt. In VS Code sieht man sie normal.
 
-## Einrichtung (einmalig pro Person)
+## Starten unter Windows (Doppelklick)
+
+**Doppelklick auf `Agent starten.bat`** im Hauptordner. Das ist alles.
+
+- Beim **ersten Start** richtet die Datei selbst alles ein (Python-Umgebung `.venv` und Pakete, 1 bis 3 Minuten). Voraussetzung ist nur ein installiertes [Python 3.11+](https://www.python.org/downloads/) („Add python.exe to PATH“ ankreuzen).
+- Der Lauf dauert einige Minuten. Das Fenster zeigt den Fortschritt und bleibt am Ende offen.
+- Danach fragt sie, ob die Excel-Datei geöffnet werden soll.
+- Ist die Excel-Datei noch **geöffnet** oder enthält eine Kriterien-CSV einen Fehler, bricht sie sofort mit einer verständlichen Meldung ab.
+- Protokoll aller Läufe: `output/log.txt`
+
+## Einrichtung für Entwicklung (einmalig pro Person)
+
+Nur nötig, wer am Code arbeitet oder Tests startet. Zum reinen Ausführen reicht `Agent starten.bat`.
 
 Voraussetzungen: [Git](https://git-scm.com/downloads) und [Python 3.11+](https://www.python.org/downloads/).
 
@@ -139,10 +153,11 @@ pip install -r requirements.txt
 
 ## Starten
 
-Immer aus dem Hauptordner `Zufall` und **lokal auf eurem Rechner** (nicht über Google Colab, sonst blockiert öffentlichevergabe.de die Anfrage):
+Unter Windows per Doppelklick auf `Agent starten.bat` (siehe oben). Oder im Terminal, immer aus dem Hauptordner `Zufall` und **lokal auf eurem Rechner** (nicht über Google Colab, sonst blockiert öffentlichevergabe.de die Anfrage):
 
 ```bash
 python -m agent.main
+python -m agent.main --protokoll output/log.txt   # Ausgabe zusätzlich ins Protokoll
 ```
 
 Das Ergebnis steht danach in `output/ausschreibungen.xlsx`:

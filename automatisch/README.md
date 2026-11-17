@@ -1,6 +1,9 @@
 # Automatisch laufen lassen
 
-Der Agent soll **einmal im Monat** von selbst laufen und dabei immer dieselbe Datei aktualisieren: `output/ausschreibungen.xlsx`. Power BI bleibt mit dieser Datei verbunden.
+**Standard ist der manuelle Start:** Doppelklick auf `Agent starten.bat` im Hauptordner (Entscheidung 17.11.2026).
+Diese Anleitung ist nur nötig, wenn der Agent zusätzlich von selbst laufen soll.
+
+Der Agent kann **einmal im Monat** (oder wöchentlich) von selbst laufen und dabei immer dieselbe Datei aktualisieren: `output/ausschreibungen.xlsx`. Power BI bleibt mit dieser Datei verbunden.
 
 ## Wichtig vorab
 
@@ -26,12 +29,16 @@ Das war's. Der Agent läuft dann am 1. jedes Monats um 8:00 Uhr.
 
 ## Windows
 
-Über die **Aufgabenplanung** (im Startmenü „Aufgabenplanung“ suchen):
+Vorher **einmal** `Agent starten.bat` per Doppelklick ausführen, damit alles eingerichtet ist.
+
+Dann über die **Aufgabenplanung** (im Startmenü „Aufgabenplanung“ suchen):
 
 1. Rechts **Einfache Aufgabe erstellen** → Name: `Ausschreibungs-Agent`
-2. Trigger: **Monatlich** → alle Monate, Tag 1, Uhrzeit 08:00
+2. Trigger: **Monatlich** → alle Monate, Tag 1, Uhrzeit 08:00 (oder **Wöchentlich**)
 3. Aktion: **Programm starten**
-   - Programm: `C:\Pfad\zu\Zufall\.venv\Scripts\python.exe`
-   - Argumente: `-m agent.main`
+   - Programm: `C:\Pfad\zu\Zufall\Agent starten.bat`
+   - Argumente: `/auto` (keine Rückfragen, Fenster schließt sich am Ende)
    - Starten in: `C:\Pfad\zu\Zufall`
-4. **Fertig stellen.** Zum Testen: Rechtsklick auf die Aufgabe → **Ausführen**.
+4. **Fertig stellen.** Zum Testen: Rechtsklick auf die Aufgabe → **Ausführen**, danach in `output\log.txt` schauen.
+
+Ist die Excel-Datei zur geplanten Zeit geöffnet, bricht der Lauf ab und vermerkt das in `output\log.txt`.

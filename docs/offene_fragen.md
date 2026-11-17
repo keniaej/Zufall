@@ -5,11 +5,11 @@ Erledigtes einfach abhaken: `- [x]`
 ## Aus dem Teamtreffen am 04.11.2026
 
 ### Technik
-- [ ] **Wo läuft das Skript?** Es muss lokal oder über einen deutschen Server laufen. Über Google Colab (US-Server) wird die Anfrage an öffentlichevergabe.de blockiert.
+- [x] **Wo läuft das Skript?** Entscheidung 17.11.2026: unter Windows, manuell per Doppelklick auf `Agent starten.bat` (lokal, nicht über Google Colab). Offen bleibt, auf welchem Rechner es nach Projektende bei ZUFALL läuft.
 - [ ] **NSPA (Nato):** wahrscheinlich nicht machbar, da keine öffentliche API. Mit ZUFALL besprechen.
-- [ ] **Feste Regeln für Dopplungen** definieren (wann gilt eine Ausschreibung als doppelt, auch über Plattformen hinweg?).
-- [ ] **Spalte Timestamp** hinzufügen, um Veränderungen aufzuzeigen.
-- [ ] **Ändert sich die Ausschreibungs-ID** auf der Plattform, wenn die Ausschreibung geändert wird? An einem echten Beispiel prüfen.
+- [x] **Feste Regeln für Dopplungen:** gleiche Verfahrens-ID = gleiche Ausschreibung, die neueste Fassung bleibt, „Gefunden auf“ nennt alle Plattformen. Bei TED und öffentlichevergabe.de kam keine Bekanntmachung ohne Verfahrens-ID an. Für künftige Quellen ohne ID (z. B. Service.Bund) wäre eine Zusatzregel nötig (Auftraggeber + Frist + ähnlicher Titel).
+- [x] **Spalte Timestamp:** umgesetzt als „Erstmals gefunden am“, „Zuletzt aktualisiert am“ und „Neu“ in der Übersicht.
+- [x] **Ändert sich die Ausschreibungs-ID** bei Änderungen? Bei TED ja (neue Bekanntmachungsnummer). Deshalb laufen Dubletten und Abgleich über die Verfahrens-ID.
   Hinweis: Der Code unterscheidet schon zwischen *Ausschreibungs ID Platform* (pro Bekanntmachung) und *Verfahrens ID* (pro Vergabeverfahren). Die Dubletten-Prüfung behält pro Verfahrens ID die neueste Bekanntmachung.
 
 ### An ZUFALL klären
@@ -27,7 +27,7 @@ Erledigtes einfach abhaken: `- [x]`
 
 ## Zur CPV-Liste v2 (14.11.2026)
 
-- [ ] **Oberbegriffe 60000000 und 63000000:** bringen Personenverkehr und Reisebüros (63510000) mit. Ausschluss-Codes ergänzen? Erster TED-Test: 29 von 75 Treffern nur über diese Oberbegriffe.
+- [x] **Oberbegriffe 60000000 und 63000000:** bringen Personenverkehr, Reisebüros u. a. mit. Entscheidung 17.11.2026: bleibt vorerst so, breite Liste ist zu Beginn gewollt. Eingrenzen später über `kriterien/ausschluss_codes.csv`.
 - [ ] **Produktnamen:** Wir verwenden ausgeschriebene Namen (Landverkehr, Kontraktlogistik, Luftfracht, Seefracht …) statt der Kürzel aus v2 (LV, KL, Luft, See). Einverstanden?
 - [ ] **Spalte Segment:** in den Bericht übernehmen?
 - [ ] **Region je Produkt:** fehlt in v2. Annahme: nur Landverkehr regional begrenzt.
