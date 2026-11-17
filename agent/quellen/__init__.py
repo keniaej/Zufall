@@ -1,16 +1,18 @@
-"""TEIL 3: QUELLEN (ADAPTER)
+"""Die Ausschreibungsportale (Quellen). Jede ist eine Klasse, die von Quelle erbt (siehe basis.py).
 
-Jede Quelle hat zwei Funktionen:
-1. ..._abrufen()        holt die Rohdaten, egal in welcher Form
-2. ..._umwandeln(roh)   übersetzt sie in das gemeinsame Format aus agent/format.py
-
-Eigenheiten einer Plattform bleiben in ihrer eigenen Datei.
-Neue Quelle hinzufügen: siehe vorlage.py
+Neue Quelle: vorlage.py kopieren, ausfüllen und die Klasse hier in QUELLEN_KLASSEN eintragen.
 """
-from agent.quellen.oeffentlichevergabe import oev_abrufen, oev_umwandeln
-from agent.quellen.ted import ted_abrufen, ted_umwandeln
+from agent.quellen.basis import Quelle
+from agent.quellen.oeffentlichevergabe import OeffentlicheVergabeQuelle
+from agent.quellen.ted import TedQuelle
 
-QUELLEN = [
-    {"name": "TED", "abrufen": ted_abrufen, "umwandeln": ted_umwandeln},
-    {"name": "oeffentlichevergabe.de", "abrufen": oev_abrufen, "umwandeln": oev_umwandeln},
-]
+# Reihenfolge = Reihenfolge der Blätter im Excel
+QUELLEN_KLASSEN = [TedQuelle, OeffentlicheVergabeQuelle]
+
+
+def alle_quellen(kriterien, einstellungen):
+    """Erzeugt je Klasse ein Quellen-Objekt mit Kriterien und Einstellungen."""
+    return [klasse(kriterien, einstellungen) for klasse in QUELLEN_KLASSEN]
+
+
+__all__ = ["Quelle", "TedQuelle", "OeffentlicheVergabeQuelle", "QUELLEN_KLASSEN", "alle_quellen"]
