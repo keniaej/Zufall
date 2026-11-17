@@ -29,5 +29,6 @@ Entwicklung zweier KI-Agenten (je eine Projektgruppe):
 ## Unsere geplante Pipeline
 
 1. **Abrufen und Python-Filter:** Ausschreibungen per API in Python abrufen. Nicht alle werden übernommen: Ein fester Filter nach Kriterien (CPV-Codes, Region, Fristen, Schlagwörter) begrenzt die Menge.
-2. **KI-Filter und Excel:** Die gefilterten Ausschreibungen werden in Python von einer KI bewertet: Sind sie für ZUFALL interessant oder nicht? Das Ergebnis wird mit der Bewertung in eine Excel-Datei geschrieben. Es gibt also zwei Filter: einen festen in Python und einen „intelligenten“ mit KI.
+2. **Excel:** Die gefilterten Ausschreibungen werden in eine Excel-Datei geschrieben. Die Übersicht wird bei jedem Lauf abgeglichen, nicht neu aufgebaut, damit Einträge von ZUFALL erhalten bleiben.
+   *Entscheidung (14.11.2026): Es gibt keine KI-Bewertung. Gefiltert wird nur regelbasiert in Python (CPV-Codes, Region, Fristen, Schlagwörter).*
 3. **Power BI:** Die qualifizierten Ausschreibungen werden in einem Power-BI-Dashboard dargestellt. Datenquelle ist die Excel-Datei.
