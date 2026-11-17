@@ -1,0 +1,32 @@
+﻿Code;Bezeichnung;Zufall Produkt;Segment;Aktiv
+60000000;Transportdienste (ohne Abfalltransport);Transport allgemein;Alle;ja
+60100000;Straßentransport/-beförderung;Landverkehr;LTL / FTL;ja
+60161000;Paketbeförderung;NSE;KEP / LTL;ja
+60180000;Vermietung von Güterbeförderungsfahrzeugen mit Fahrer;Landverkehr;FTL;ja
+60181000;Vermietung von Lastkraftwagen mit Fahrer;Landverkehr;FTL;ja
+60183000;Vermietung von Lieferwagen mit Fahrer;NSE;KEP / Last Mile;ja
+60200000;Beförderung mit der Eisenbahn;Schiene;Multimodal;ja
+60400000;Beförderung im Luftverkehr;Luftfracht;Luftfracht;ja
+60600000;Beförderung mit Wasserfahrzeugen;Seefracht;Seefracht / Binnen;ja
+60640000;Frachtschifffahrt;Seefracht;Seefracht / Binnen;ja
+63000000;"Unterstützende und ergänzende Tätigkeiten für den Verkehrssektor; Reisebüros";Logistik allgemein;Alle;ja
+63100000;Frachtumschlag, Frachtlagerung und zugehörige Dienste;Kontraktlogistik;Kontraktlogistik;ja
+63110000;Frachtumschlag und -lagerung;Kontraktlogistik;Kontraktlogistik / Hub;ja
+63111000;Containerumschlag;Seefracht;Multimodal / Hub;ja
+63120000;Lagerung und Lagerhaltung;Kontraktlogistik;Kontraktlogistik / Fulfillment;ja
+63121000;Dienstleistung in Verbindung mit Speicherung und Nachweis;Kontraktlogistik;Kontraktlogistik;ja
+63121100;Lagerung;Kontraktlogistik;Kontraktlogistik;ja
+63122000;Lagerhaltung;Kontraktlogistik;Kontraktlogistik;ja
+63520000;Transportagenturen;Spedition;Spedition / 4PL;ja
+63521000;Frachtagenturen;Spedition;Spedition;ja
+63523000;Spediteure und Frachtagenturen;Spedition;Spedition;ja
+63524000;Ausstellen von Transportpapieren;Spedition;Zoll / Dokumente;ja
+64100000;Post- und Kurierdienste;NSE;KEP;ja
+64113000;Paketpostdienste;NSE;KEP / LTL;ja
+64120000;Kurierdienste;NSE;KEP / Express;ja
+64121000;Multimodaler Kurierdienst;NSE;KEP / Express;ja
+64121200;Paketzustellung;NSE;KEP / Last Mile;ja
+79571000;Postversand;Kontraktlogistik;Fulfillment;ja
+79920000;Dienstleistungen des Abfüll- und Verpackungsgewerbes und zugehörige Leistungen;Kontraktlogistik;Kontraktlogistik / VAS;ja
+79921000;Dienstleistungen des Abfüll- und Verpackungsgewerbes;Kontraktlogistik;Kontraktlogistik / VAS;ja
+79991000;Lagerbestandskontrolle;Kontraktlogistik;Kontraktlogistik;ja

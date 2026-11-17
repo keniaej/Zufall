@@ -10,8 +10,8 @@ import zipfile
 import pandas as pd
 import requests
 
-from agent.format import SPALTEN, cpv_passt, datum
-from agent.konfiguration import CPV_CODES, LAENDER, NOTICE_TYPEN, PERSONENVERKEHR, SEIT_DATUM
+from agent.format import SPALTEN, cpv_passt, datum, land, laufzeit, vergabeart
+from agent.konfiguration import CPV_CODES, LAENDER, NOTICE_TYPEN, AUSSCHLUSS_CODES, SEIT_DATUM
 
 OEV_URL = "https://oeffentlichevergabe.de/api/notice-exports"
 
@@ -20,7 +20,7 @@ def oev_download(parameter):
     """Lädt ein ZIP von öffentlichevergabe.de. Bis zu 3 Versuche, die Seite bricht gelegentlich ab."""
     for versuch in range(3):
         try:
-            antwort = requests.get(OEV_URL, params=parameter, timeout=180)
+            antwort = requests.get(OEV_URL, params=parameter, timeout=600)   # Monats-ZIPs: bis ca. 100 MB
             antwort.raise_for_status()
             return zipfile.ZipFile(io.BytesIO(antwort.content))
         except requests.RequestException:
@@ -59,7 +59,20 @@ def oev_treffer_aus_csv(zip_datei):
     # Auftraggeber: erste Organisation mit Rolle "buyer"
     org = oev_csv_lesen(zip_datei, "organisation")
     org = (org[org["organisationRole"] == "buyer"]
-           .groupby(schluessel)[["organisationName", "organisationCity", "organisationCountryCode"]].first())
+           .groupby(schluessel)[["organisationName", "organisationCity", "organisationPostCode",
+                                 "organisationCountryCode"]].first())
+
+    # Verfahrensart (open, restricted ...)
+    verfahren = oev_csv_lesen(zip_datei, "procedure").groupby(schluessel)["procedureType"].first()
+
+    # Vertragslaufzeit pro Los -> Monate, frühester Beginn, spätestes Ende (siehe format.laufzeit)
+    dauer = oev_csv_lesen(zip_datei, "duration")
+    dauer = pd.DataFrame(
+        [(*schl, *laufzeit(d["durationPeriod"].tolist(), d["durationPeriodUnit"].tolist(),
+                           d["durationStartDate"].tolist(), d["durationEndDate"].tolist()))
+         for schl, d in dauer.groupby(schluessel)],
+        columns=schluessel + ["dauer_monate", "vertragsbeginn", "vertragsende"],
+    ).set_index(schluessel)
 
     # Titel: Zeile ohne Los = Titel des ganzen Verfahrens
     zweck = oev_csv_lesen(zip_datei, "purpose")
@@ -73,6 +86,7 @@ def oev_treffer_aus_csv(zip_datei):
 
     treffer = (notice.set_index(schluessel)
                .join(alle_cpv).join(haupt_cpv).join(org).join(titel).join(nuts)
+               .join(verfahren).join(dauer)
                .reset_index())
 
     # Grobfilter: Land, ZUFALL-CPV irgendwo, kein Personenverkehr als Hauptcode
@@ -81,7 +95,7 @@ def oev_treffer_aus_csv(zip_datei):
         codes = zeile["alle_cpv"] if isinstance(zeile["alle_cpv"], list) else []
         if zeile["organisationCountryCode"] not in LAENDER:
             return False
-        if any(cpv_passt(zeile["haupt_cpv"], p) for p in PERSONENVERKEHR):
+        if any(cpv_passt(zeile["haupt_cpv"], p) for p in AUSSCHLUSS_CODES):
             return False
         return any(cpv_passt(c, z) for c in codes for z in CPV_CODES)
 
@@ -91,7 +105,7 @@ def oev_treffer_aus_csv(zip_datei):
 
 
 def oev_xml_auslesen(xml_inhalt):
-    """Holt Frist und Link aus einer eForms-XML-Datei.
+    """Holt Frist, Link, E-Mail und Straße des Auftraggebers aus einer eForms-XML-Datei.
     {*} heißt: Namensraum egal. eForms verwendet mehrere Namensräume (cbc, cac, efac ...)."""
     wurzel = ET.fromstring(xml_inhalt)
 
@@ -100,11 +114,46 @@ def oev_xml_auslesen(xml_inhalt):
         return min(werte) if werte else None   # mehrere Lose -> früheste Frist zählt
 
     link = wurzel.find(".//{*}CallForTendersDocumentReference//{*}URI")
+
+    # Auftraggeber: ContractingParty verweist auf eine Organisation (z. B. ORG-0001),
+    # deren Adresse und E-Mail stehen unter efac:Organization/efac:Company
+    kaeufer_id = wurzel.findtext(".//{*}ContractingParty/{*}Party/{*}PartyIdentification/{*}ID")
+    kaeufer = None
+    for firma in wurzel.findall(".//{*}Organization/{*}Company"):
+        if firma.findtext("{*}PartyIdentification/{*}ID") == kaeufer_id:
+            kaeufer = firma
+            break
+
+    def kaeufer_feld(pfad):
+        return kaeufer.findtext(pfad) if kaeufer is not None else None
+
     return {
+        "email": kaeufer_feld("{*}Contact/{*}ElectronicMail"),
+        "strasse": kaeufer_feld("{*}PostalAddress/{*}StreetName"),
         "angebot": fruehestes_datum(".//{*}TenderSubmissionDeadlinePeriod/{*}EndDate"),
         "teilnahme": fruehestes_datum(".//{*}ParticipationRequestReceptionPeriod/{*}EndDate"),
         "link": link.text if link is not None else None,
     }
+
+
+def version_nr(version):
+    """'01' und '1' sind dieselbe Version (CSV und XML-Dateinamen schreiben sie unterschiedlich)."""
+    try:
+        return int(str(version))
+    except ValueError:
+        return str(version)
+
+
+def xml_dateien_je_bekanntmachung(namen):
+    """Dateinamen im eForms-ZIP: '<noticeIdentifier>-<Version>.xml' -> {(ID, Version): Dateiname}"""
+    dateien = {}
+    for name in namen:
+        if not name.endswith(".xml"):
+            continue
+        basis = name.rsplit("/", 1)[-1][:-4]
+        nid, _, version = basis.rpartition("-")
+        dateien[(nid, version_nr(version))] = name
+    return dateien
 
 
 def oev_monate():
@@ -124,19 +173,27 @@ def oev_abrufen():
     treffer["tag"] = treffer["publicationDate"].str[:10]
     treffer = treffer[treffer["tag"] >= pd.Timestamp(SEIT_DATUM).strftime("%Y-%m-%d")]
 
-    # Schritt 2: Details aus dem XML, ein Download pro Veröffentlichungstag
+    # Schritt 2: Details aus dem XML, ein Download pro MONAT.
+    # Der Tagesexport (pubDay) liefert höchstens 1.000 XML-Dateien, an vollen Tagen fehlen also welche
+    # (getestet 14.11.2026: 05.11. hatte 1.170 Bekanntmachungen, aber nur 1.000 XML-Dateien).
+    # Der Monatsexport ist vollständig und braucht weniger Downloads.
     details = {}
-    tage = sorted(treffer["tag"].unique())
-    print(f"  öffentlichevergabe.de: lade XML für {len(tage)} Tage ...")
-    for tag in tage:
-        zip_datei = oev_download({"pubDay": tag, "format": "eforms.zip"})
-        dateien = zip_datei.namelist()
-        for nid in treffer.loc[treffer["tag"] == tag, "noticeIdentifier"]:
-            passend = [d for d in dateien if d.startswith(nid)]
-            if passend:
-                details[nid] = oev_xml_auslesen(zip_datei.read(passend[-1]))
+    monate = sorted(treffer["tag"].str[:7].unique())
+    print(f"  öffentlichevergabe.de: lade XML für {len(monate)} Monate ...")
+    for monat in monate:
+        zip_datei = oev_download({"pubMonth": monat, "format": "eforms.zip"})
+        dateien = xml_dateien_je_bekanntmachung(zip_datei.namelist())
+        for _, t in treffer[treffer["tag"].str[:7] == monat].iterrows():
+            datei = dateien.get((t["noticeIdentifier"], version_nr(t["noticeVersion"])))
+            if datei:
+                details[(t["noticeIdentifier"], t["noticeVersion"])] = oev_xml_auslesen(zip_datei.read(datei))
 
-    treffer["details"] = treffer["noticeIdentifier"].map(details)
+    schluessel = list(zip(treffer["noticeIdentifier"], treffer["noticeVersion"]))
+    treffer["details"] = [details.get(k) for k in schluessel]
+    fehlend = sum(k not in details for k in schluessel)
+    if fehlend:
+        print(f"  WARNUNG öffentlichevergabe.de: für {fehlend} Bekanntmachungen keine XML gefunden "
+              f"(Frist, E-Mail, Straße, Link fehlen dort)")
     return treffer
 
 
@@ -151,7 +208,8 @@ def oev_umwandeln(treffer):
         elif d.get("teilnahme"):
             frist, fristart = d["teilnahme"], "Teilnahmeantrag"
         else:
-            frist, fristart = None, "keine Angabe"
+            frist = None
+            fristart = "keine Angabe" if d else "unbekannt (XML fehlt im Export)"
 
         zeilen.append({
             "Ausschreibungs ID Platform": f"{t['noticeIdentifier']}-{t['noticeVersion']}",
@@ -162,7 +220,15 @@ def oev_umwandeln(treffer):
             "Vergabe Branchen Code": t["haupt_cpv"],
             "Alle CPV": ", ".join(t["alle_cpv"]) if isinstance(t["alle_cpv"], list) else "",
             "Auftraggeber": t["organisationName"],
+            "Email": d.get("email"),
             "Stadt": t["organisationCity"],
+            "Straße": d.get("strasse"),
+            "PLZ": t["organisationPostCode"],
+            "Land": land(t["organisationCountryCode"]),
+            "Vergabeart": vergabeart(t["procedureType"]),
+            "Vertragsdauer in Monaten": t["dauer_monate"],
+            "Vertragsbeginn": t["vertragsbeginn"],
+            "Vertragsende": t["vertragsende"],
             "Leistungsort NUTS": t["nuts"] if isinstance(t["nuts"], str) else "",
             "Angebotsfrist": datum(frist),
             "Fristart": fristart,

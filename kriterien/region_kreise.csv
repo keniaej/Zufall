@@ -1,0 +1,94 @@
+﻿NUTS-Code;Landkreis;Standort;Lage;Entfernung Mittelpunkt km;Entfernung Rand km;NUTS-Stand
+DE265;Bad Kissingen;Eichenzell;im Radius;34;8;2021, 2024
+DE719;Main-Kinzig-Kreis;Eichenzell;im Radius;40;12;2021, 2024
+DE266;Rhön-Grabfeld;Eichenzell;im Radius;41;18;2021, 2024
+DEG0Q;Schmalkalden-Meiningen;Eichenzell;im Radius;52;24;2024
+DEG0B;Schmalkalden-Meiningen;Eichenzell;im Radius;52;24;2021
+DE26A;Main-Spessart;Eichenzell;im Radius;55;29;2021, 2024
+DE71E;Wetteraukreis;Eichenzell;im Radius;58;30;2021, 2024
+DE264;Aschaffenburg, Landkreis;Eichenzell;im Radius;59;46;2021, 2024
+DE262;Schweinfurt, Kreisfreie Stadt;Eichenzell;im Radius;61;57;2021, 2024
+DE261;Aschaffenburg, Kreisfreie Stadt;Eichenzell;Randkreis;70;66;2021, 2024
+DE26B;Schweinfurt, Landkreis;Eichenzell;Randkreis;71;47;2021, 2024
+DE26C;Würzburg, Landkreis;Eichenzell;Randkreis;77;62;2021, 2024
+DE267;Haßberge;Eichenzell;Randkreis;79;62;2021, 2024
+DE71C;Offenbach, Landkreis;Eichenzell;Randkreis;82;68;2021, 2024
+DE269;Miltenberg;Eichenzell;Randkreis;86;69;2021, 2024
+DE732;Fulda;Fulda;im Radius;6;0;2021, 2024
+DE725;Vogelsbergkreis;Fulda;im Radius;30;8;2021, 2024
+DE733;Hersfeld-Rotenburg;Fulda;im Radius;39;18;2021, 2024
+DEG0P;Wartburgkreis;Fulda;im Radius;54;17;2021
+DEG0R;Wartburgkreis;Fulda;im Radius;55;17;2024
+DEG05;Weimar, Kreisfreie Stadt;Grammetal;im Radius;7;4;2021, 2024
+DEG01;Erfurt, Kreisfreie Stadt;Grammetal;im Radius;14;4;2021, 2024
+DEG0G;Weimarer Land;Grammetal;im Radius;16;0;2021, 2024
+DEG0D;Sömmerda;Grammetal;im Radius;21;7;2021, 2024
+DEG03;Jena, Kreisfreie Stadt;Grammetal;im Radius;25;20;2021, 2024
+DEG0T;Ilm-Kreis;Grammetal;im Radius;30;9;2024
+DEG0F;Ilm-Kreis;Grammetal;im Radius;30;9;2021
+DEG0J;Saale-Holzland-Kreis;Grammetal;im Radius;36;19;2021, 2024
+DEG0U;Saalfeld-Rudolstadt;Grammetal;im Radius;36;15;2024
+DEG0C;Gotha;Grammetal;im Radius;37;18;2021, 2024
+DEG0I;Saalfeld-Rudolstadt;Grammetal;im Radius;37;15;2021
+DEG0A;Kyffhäuserkreis;Grammetal;im Radius;43;30;2021, 2024
+DEE08;Burgenlandkreis;Grammetal;im Radius;51;24;2021, 2024
+DEG0S;Suhl, Kreisfreie Stadt;Grammetal;im Radius;52;43;2024
+DEG09;Unstrut-Hainich-Kreis;Grammetal;im Radius;52;28;2021, 2024
+DEG04;Suhl, Kreisfreie Stadt;Grammetal;im Radius;53;46;2021
+DEG0K;Saale-Orla-Kreis;Grammetal;im Radius;55;32;2021, 2024
+DEG0H;Sonneberg;Grammetal;im Radius;59;47;2021
+DEG0V;Sonneberg;Grammetal;im Radius;60;44;2024
+DEG02;Gera, Kreisfreie Stadt;Grammetal;im Radius;61;56;2021, 2024
+DEG0N;Eisenach, Kreisfreie Stadt;Grammetal;im Radius;63;58;2021
+DEE0A;Mansfeld-Südharz;Grammetal;im Radius;64;44;2021, 2024
+DEG0L;Greiz;Grammetal;im Radius;68;47;2021, 2024
+DEG0E;Hildburghausen;Grammetal;im Radius;68;45;2021, 2024
+DEE0B;Saalekreis;Grammetal;im Radius;69;40;2021, 2024
+DE24A;Kronach;Grammetal;Randkreis;71;50;2021, 2024
+DE247;Coburg, Landkreis;Grammetal;Randkreis;89;66;2021, 2024
+DED44;Vogtlandkreis;Grammetal;Randkreis;89;65;2021, 2024
+DE249;Hof, Landkreis;Grammetal;Randkreis;95;68;2021, 2024
+DE91C;Göttingen;Göttingen;im Radius;4;0;2021, 2024
+DE918;Northeim;Göttingen;im Radius;24;8;2021, 2024
+DEG06;Eichsfeld;Göttingen;im Radius;28;13;2021, 2024
+DE926;Holzminden;Göttingen;im Radius;45;35;2021, 2024
+DE916;Goslar;Göttingen;im Radius;52;33;2021, 2024
+DEG07;Nordhausen;Göttingen;im Radius;55;37;2021, 2024
+DE925;Hildesheim;Göttingen;im Radius;61;40;2021, 2024
+DE923;Hameln-Pyrmont;Göttingen;Randkreis;72;52;2021, 2024
+DE912;Salzgitter, Kreisfreie Stadt;Göttingen;Randkreis;72;60;2021, 2024
+DEE09;Harz;Göttingen;Randkreis;77;52;2021, 2024
+DE91B;Wolfenbüttel;Göttingen;Randkreis;83;56;2021, 2024
+DE929;Region Hannover;Göttingen;Randkreis;100;68;2021, 2024
+DEA5A;Siegen-Wittgenstein;Haiger;im Radius;17;5;2021, 2024
+DE722;Lahn-Dill-Kreis;Haiger;im Radius;18;0;2021, 2024
+DEB13;Altenkirchen (Westerwald);Haiger;im Radius;33;13;2021, 2024
+DEB1B;Westerwaldkreis;Haiger;im Radius;35;11;2021, 2024
+DE724;Marburg-Biedenkopf;Haiger;im Radius;37;13;2021, 2024
+DEA59;Olpe;Haiger;im Radius;38;26;2021, 2024
+DE723;Limburg-Weilburg;Haiger;im Radius;39;20;2021, 2024
+DE721;Gießen, Landkreis;Haiger;im Radius;47;26;2021, 2024
+DEA2A;Oberbergischer Kreis;Haiger;im Radius;56;33;2021, 2024
+DEA57;Hochsauerlandkreis;Haiger;im Radius;57;36;2021, 2024
+DE718;Hochtaunuskreis;Haiger;im Radius;59;43;2021, 2024
+DEB18;Neuwied;Haiger;im Radius;59;40;2021, 2024
+DEB1A;Rhein-Lahn-Kreis;Haiger;im Radius;63;44;2021, 2024
+DEB11;Koblenz, Kreisfreie Stadt;Haiger;im Radius;63;58;2021, 2024
+DEA58;Märkischer Kreis;Haiger;im Radius;64;43;2021, 2024
+DEA2C;Rhein-Sieg-Kreis;Haiger;im Radius;66;37;2021, 2024
+DE71D;Rheingau-Taunus-Kreis;Haiger;Randkreis;71;53;2021, 2024
+DE71A;Main-Taunus-Kreis;Haiger;Randkreis;75;64;2021, 2024
+DEA2B;Rheinisch-Bergischer Kreis;Haiger;Randkreis;77;60;2021, 2024
+DE714;Wiesbaden, Kreisfreie Stadt;Haiger;Randkreis;77;69;2021, 2024
+DE712;Frankfurt am Main, Kreisfreie Stadt;Haiger;Randkreis;79;70;2021, 2024
+DEB17;Mayen-Koblenz;Haiger;Randkreis;79;53;2021, 2024
+DEB12;Ahrweiler;Haiger;Randkreis;87;69;2021, 2024
+DEA5B;Soest;Haiger;Randkreis;88;68;2021, 2024
+DE731;Kassel, Kreisfreie Stadt;Kassel;im Radius;3;0;2021, 2024
+DE734;Kassel, Landkreis;Kassel;im Radius;12;2;2021, 2024
+DE737;Werra-Meißner-Kreis;Kassel;im Radius;33;11;2021, 2024
+DE735;Schwalm-Eder-Kreis;Kassel;im Radius;34;10;2021, 2024
+DE736;Waldeck-Frankenberg;Kassel;im Radius;44;23;2021, 2024
+DEA44;Höxter;Kassel;im Radius;45;25;2021, 2024
+DEA47;Paderborn;Kassel;im Radius;66;44;2021, 2024
+DEA45;Lippe;Kassel;Randkreis;83;61;2021, 2024

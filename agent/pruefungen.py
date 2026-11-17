@@ -3,10 +3,12 @@
 Gelten für alle Quellen gleich. Jede Prüfung gibt zwei Tabellen zurück: (behalten, aussortiert).
 Aussortiertes bekommt einen Grund, damit die Regeln später im Excel nachvollziehbar sind.
 """
+import re
+
 import pandas as pd
 
 from agent.format import cpv_passt
-from agent.konfiguration import (AUSSCHLUSS_WOERTER, PERSONENVERKEHR, PRODUKTE,
+from agent.konfiguration import (AUSSCHLUSS_CODES, AUSSCHLUSS_WOERTER, PRODUKTE,
                                  REGION_KREISE, REGION_PRODUKTE)
 
 
@@ -26,7 +28,7 @@ def produkte_ermitteln(codes):
 
 def cpv_pruefen(tabelle):
     """Ordnet das ZUFALL-Produkt zu und sortiert aus: kein ZUFALL-Code
-    oder Personenverkehr als Hauptcode."""
+    oder Hauptcode aus kriterien/ausschluss_codes.csv (z. B. Personenverkehr)."""
     gruende, produkte = [], []
     for _, zeile in tabelle.iterrows():
         codes = [c.strip() for c in str(zeile["Alle CPV"]).split(",") if c.strip()]
@@ -34,8 +36,9 @@ def cpv_pruefen(tabelle):
         gefunden = produkte_ermitteln(codes)
         produkte.append(", ".join(gefunden))
 
-        if any(cpv_passt(haupt, p) for p in PERSONENVERKEHR):
-            gruende.append("Personenverkehr (Hauptcode)")
+        ausschluss = [grund for code, grund in AUSSCHLUSS_CODES.items() if cpv_passt(haupt, code)]
+        if ausschluss:
+            gruende.append(f"{ausschluss[0]} (Hauptcode)")
         elif not gefunden:
             gruende.append("kein ZUFALL-CPV-Code")
         else:
@@ -71,7 +74,7 @@ def region_pruefen(tabelle):
             gruende.append(None)
         else:
             region.append("nein: " + ", ".join(kreise))
-            gruende.append("Landverkehr außerhalb der Region" if nur_regional else None)
+            gruende.append(f"{', '.join(produkte)} außerhalb der Region" if nur_regional else None)
 
     tabelle = tabelle.copy()
     tabelle["Region Landverkehr"] = region
@@ -87,7 +90,10 @@ def nur_offene_fristen(tabelle):
 
 
 def schlagwoerter_pruefen(tabelle):
-    muster = r"\b(?:" + "|".join(AUSSCHLUSS_WOERTER) + ")"
+    if not AUSSCHLUSS_WOERTER:
+        return aufteilen(tabelle, [None] * len(tabelle))
+    # re.escape: Sonderzeichen in der CSV (z. B. Klammern) sollen nichts kaputt machen
+    muster = r"\b(?:" + "|".join(re.escape(w) for w in AUSSCHLUSS_WOERTER) + ")"
     treffer = tabelle["Titel"].str.extract(f"({muster})", flags=2)[0]  # flags=2: Groß/klein egal
     gruende = [f"Schlagwort im Titel: {w.lower()}" if isinstance(w, str) else None for w in treffer]
     return aufteilen(tabelle, gruende)
