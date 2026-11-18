@@ -1,0 +1,26 @@
+{
+    // Start in VS Code: Run/F5. Startet den Agenten richtig als Modul (python -m agent.main).
+    // Vorher unten rechts den Interpreter aus .venv auswählen.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Agent starten",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "agent.main",
+            "args": ["--protokoll", "output/log.txt"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-q"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

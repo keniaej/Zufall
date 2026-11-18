@@ -9,7 +9,6 @@ Basisklassen Quelle und Pruefung. Neue Quellen und Prüfungen brauchen hier also
 import pandas as pd
 
 from agent.modell import LaufErgebnis, leere_tabelle, verfahrens_ids
-from agent.pruefungen.cpv import codes_aus_text
 from agent.pruefungen.dubletten import DublettenErkennung
 
 
@@ -33,11 +32,15 @@ class Agent:
         for name, text in status.items():
             print(f"{name}: {text}")
 
-        # 2. Dubletten zuerst, damit danach die neueste Frist geprüft wird
+        # 2. Für ALLE Zeilen (auch spätere Dubletten): ZUFALL-Produkt und auf welchen Plattformen
+        alle["Zufall Produkt"] = alle["Alle CPV"].map(self.kriterien.produkt_text)
+        alle["Gefunden auf"] = self.dubletten.gefunden_auf(alle)
+
+        # 3. Dubletten zuerst, damit danach die neueste Frist geprüft wird
         behalten = self.dubletten.entfernen(alle)
         print("Nach Dubletten:", len(behalten))
 
-        # 3. Prüfungen der Reihe nach, Aussortiertes mit Grund sammeln
+        # 4. Prüfungen der Reihe nach, Aussortiertes mit Grund sammeln
         relevant, aussortiert = self.pruefen(behalten)
 
         ergebnis = LaufErgebnis(
@@ -47,7 +50,7 @@ class Agent:
         )
         self.zusammenfassung_ausgeben(ergebnis)
 
-        # 4. Bericht schreiben (die Excel-Datei ist auch die Datenquelle fürs Dashboard)
+        # 5. Bericht schreiben (die Excel-Datei ist auch die Datenquelle fürs Dashboard)
         if self.bericht:
             pfad = self.bericht.schreiben(ergebnis)
             print(f"\nExcel gespeichert: {pfad}")
@@ -82,12 +85,11 @@ class Agent:
         return tabelle, aussortiert
 
     def ergebnis_je_bekanntmachung(self, alle, behalten, relevant, aussortiert):
-        """Ergänzt die komplette Abruf-Tabelle um die Spalte 'Ergebnis' und die berechneten Spalten.
-        Ergebnis ist 'relevant', 'aussortiert: <Grund>' oder 'Dublette, behalten wurde ...'."""
+        """Ergänzt die komplette Abruf-Tabelle um die Spalte 'Ergebnis' (und 'Region Landverkehr').
+        Ergebnis ist 'relevant', 'aussortiert: <Grund>' oder 'Dublette, behalten wurde ...'.
+        Zugeordnet wird über die Zeilennummern, die beim Abruf vergeben wurden."""
         gesamt = alle.copy()
         gesamt["Ergebnis"] = None
-
-        # Region aus den Prüfungen übernehmen (Produkt und "Gefunden auf" siehe unten)
         for tabelle in (relevant, aussortiert):
             if "Region Landverkehr" in tabelle.columns:
                 gesamt.loc[tabelle.index, "Region Landverkehr"] = tabelle["Region Landverkehr"]
@@ -96,17 +98,14 @@ class Agent:
         if len(aussortiert):
             gesamt.loc[aussortiert.index, "Ergebnis"] = "aussortiert: " + aussortiert["Ausschlussgrund"]
 
-        # Produkt und "Gefunden auf" auch für Dubletten, damit die Spalten überall befüllt sind
-        gesamt["Zufall Produkt"] = [", ".join(self.kriterien.produkte_ermitteln(codes_aus_text(cpv))) or None
-                                    for cpv in gesamt["Alle CPV"]]
-        verfahren = verfahrens_ids(gesamt)
-        gesamt["Gefunden auf"] = verfahren.map(behalten.set_index("Verfahrens ID")["Gefunden auf"])
-
         # Dubletten: abgerufen, aber bei der Dubletten-Erkennung weggefallen
-        behalten_je_verfahren = {z["Verfahrens ID"]: f"{z['Plattform']} {z['Ausschreibungs ID Platform']}"
-                                 for _, z in behalten.iterrows()}
-        for nr in gesamt.index.difference(behalten.index):
-            gesamt.at[nr, "Ergebnis"] = f"Dublette, behalten wurde {behalten_je_verfahren.get(verfahren[nr], '?')}"
+        dubletten = gesamt.index.difference(behalten.index)
+        if len(dubletten):
+            behalten_als = pd.Series(
+                (behalten["Plattform"] + " " + behalten["Ausschreibungs ID Platform"].astype(str)).values,
+                index=verfahrens_ids(behalten))
+            gesamt.loc[dubletten, "Ergebnis"] = ("Dublette, behalten wurde "
+                                                 + verfahrens_ids(gesamt.loc[dubletten]).map(behalten_als))
         return gesamt
 
     @staticmethod

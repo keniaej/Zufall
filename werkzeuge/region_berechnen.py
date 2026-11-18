@@ -23,7 +23,8 @@ import sys
 import zipfile
 from pathlib import Path
 
-import requests
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # damit agent/ gefunden wird
+from agent.netz import json_abrufen  # noqa: E402
 
 ORDNER = Path(__file__).resolve().parent.parent / "kriterien"
 GISCO = "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson"
@@ -76,9 +77,7 @@ def kleinster_abstand(lat, lon, geometrie):
 
 
 def laden(datei):
-    antwort = requests.get(f"{GISCO}/{datei}", timeout=300)
-    antwort.raise_for_status()
-    return antwort.json()["features"]
+    return json_abrufen(f"{GISCO}/{datei}", timeout=300, versuche=3)["features"]
 
 
 def standorte_lesen():

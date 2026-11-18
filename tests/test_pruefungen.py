@@ -51,10 +51,23 @@ def test_dubletten_neueste_fassung_gewinnt():
         "Plattform": ["TED", "oeffentlichevergabe.de", "TED"],
         "Publikation": pd.to_datetime(["2026-10-01", "2026-10-05", "2026-10-02"]),
     })
-    behalten = DublettenErkennung().entfernen(tabelle).set_index("Verfahrens ID")
-    assert behalten.loc["v1", "Ausschreibungs ID Platform"] == "neu"
-    assert behalten.loc["v1", "Gefunden auf"] == "TED, oeffentlichevergabe.de"
-    assert "ohne-id" in behalten.index                   # ohne Verfahrens-ID: eigene Zeile
+    tabelle["Gefunden auf"] = DublettenErkennung.gefunden_auf(tabelle)
+    behalten = DublettenErkennung.entfernen(tabelle)
+    assert sorted(behalten["Ausschreibungs ID Platform"]) == ["neu", "ohne-id"]   # ohne Verfahrens-ID: eigene Zeile
+    assert behalten.loc[1, "Gefunden auf"] == "TED, oeffentlichevergabe.de"
+    assert behalten["Verfahrens ID"].isna().sum() == 1   # fehlende ID wird nicht aufgefüllt
+
+
+def test_dubletten_gleicher_tag_erste_quelle_gewinnt():
+    tag = pd.Timestamp("2026-10-05")
+    tabelle = pd.DataFrame({
+        "Verfahrens ID": ["v1", "v2", "v1", "v2"],
+        "Ausschreibungs ID Platform": ["ted-1", "ted-2", "oev-1", "oev-2"],
+        "Plattform": ["TED", "TED", "oeffentlichevergabe.de", "oeffentlichevergabe.de"],
+        "Publikation": [tag, tag - pd.Timedelta(days=1), tag, tag],
+    })
+    behalten = DublettenErkennung.entfernen(tabelle)
+    assert sorted(behalten["Ausschreibungs ID Platform"]) == ["oev-2", "ted-1"]   # Gleichstand -> TED, sonst neueste
 
 
 def test_reihenfolge_der_pruefungen(kriterien):

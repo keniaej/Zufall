@@ -3,9 +3,9 @@
 Braucht keinen API-Key. Die Search API filtert schon auf dem Server (CPV, Land, Datum, Art).
 """
 import pandas as pd
-import requests
 
 from agent.modell import SPALTEN
+from agent.netz import json_abrufen
 from agent.quellen.basis import Quelle
 from agent.werte import datum, erster, fristart_waehlen, land, laufzeit, vergabeart
 
@@ -63,9 +63,8 @@ class TedQuelle(Quelle):
         anfrage = self.anfrage_bauen()
         alle_notices = []
         while True:
-            antwort = requests.post(self.URL, json=anfrage, timeout=60)
-            antwort.raise_for_status()   # bei Fehler abbrechen, der Agent fängt das ab
-            daten = antwort.json()
+            # bei Fehler abbrechen, der Agent fängt das ab und vermerkt es im Status
+            daten = json_abrufen(self.URL, json_daten=anfrage, timeout=60, versuche=3)
             alle_notices.extend(daten["notices"])
 
             # TED schickt auch nach der letzten Seite noch ein Lesezeichen

@@ -39,18 +39,11 @@ def leere_tabelle():
     return pd.DataFrame(columns=SPALTEN)
 
 
-def verfahrens_id(zeile):
-    """Merkmal, über das dieselbe Ausschreibung erkannt wird (Dubletten, Abgleich der Übersicht).
-    Ohne Verfahrens-ID die Plattform-ID (kommt bei TED/öffentlichevergabe.de nicht vor)."""
-    vid = zeile.get("Verfahrens ID")
-    if vid is None or pd.isna(vid) or vid == "":
-        vid = zeile.get("Ausschreibungs ID Platform")
-    return str(vid)
-
-
 def verfahrens_ids(tabelle):
-    """Wie verfahrens_id(), für eine ganze Tabelle auf einmal."""
-    return tabelle["Verfahrens ID"].fillna(tabelle["Ausschreibungs ID Platform"])
+    """Merkmal je Zeile, über das dieselbe Ausschreibung erkannt wird (Dubletten, Abgleich der Übersicht).
+    Ohne Verfahrens-ID die Plattform-ID (kommt bei TED/öffentlichevergabe.de nicht vor).
+    Die Spalte "Verfahrens ID" selbst bleibt dabei unverändert (nichts erfinden)."""
+    return tabelle["Verfahrens ID"].fillna(tabelle["Ausschreibungs ID Platform"]).astype(str)
 
 
 @dataclass

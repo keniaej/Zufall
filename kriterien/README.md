@@ -54,6 +54,8 @@ Ausschreibungen ganz ohne Angabe zum Leistungsort bleiben drin (lieber mehr als 
 
 ## Prüfen nach einer Änderung
 
+Am einfachsten: `Agent starten.bat` starten. Wer die Tests nutzen will (einmalig `pip install -r requirements-dev.txt`):
+
 ```bash
 python -m pytest
 ```

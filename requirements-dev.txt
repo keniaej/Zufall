@@ -1,0 +1,3 @@
+# Zusätzlich für die Entwicklung (Tests). Installieren mit: pip install -r requirements-dev.txt
+-r requirements.txt
+pytest>=8.0

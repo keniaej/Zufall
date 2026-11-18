@@ -8,7 +8,7 @@ Alles, was ZUFALL selbst einträgt (eigene Spalten, Notizen, Farben), bleibt erh
 Spalten werden über ihre Überschrift gefunden: ZUFALL darf sie in Excel beliebig verschieben.
 """
 from agent.bericht.excel_hilfen import als_tabelle, letzte_datenzeile, spaltenbreite, zelle_formatieren, zellwert
-from agent.modell import verfahrens_id
+from agent.modell import verfahrens_ids
 
 # ZUFALLs Zielstruktur, Reihenfolge wie in "Berichtsstruktur Öffentliche Transportausschreibungen.xlsx"
 ZUFALL_SPALTEN = [
@@ -75,15 +75,9 @@ class UebersichtAbgleich:
         }
 
     def blatt_holen(self, wb):
-        """Vorhandene Übersicht nehmen. Fehlt sie (oder ist sie aus der Zeit vor dem Abgleich,
-        also ohne Spalte 'Verfahrens ID'), wird sie neu angelegt. Der alte Stand liegt dann in der Sicherung."""
+        """Vorhandene Übersicht nehmen, nur beim allerersten Lauf neu anlegen."""
         if self.BLATT in wb.sheetnames:
-            ws = wb[self.BLATT]
-            if "Verfahrens ID" in [c.value for c in ws[1]]:
-                return ws, False
-            print(f"Hinweis: '{self.BLATT}' hat noch keine Spalte 'Verfahrens ID' und wird neu angelegt "
-                  f"(alter Stand in der Sicherung).")
-            wb.remove(ws)
+            return wb[self.BLATT], False
         ws = wb.create_sheet(self.BLATT, 0)
         for nr, name in enumerate(UEBERSICHT_SPALTEN, start=1):
             ws.cell(row=1, column=nr, value=name)
@@ -105,7 +99,8 @@ class UebersichtAbgleich:
 
         # Pro Verfahren die eine behaltene Zeile (relevant oder aussortiert, keine Dublette)
         behalten = gesamt[~gesamt["Ergebnis"].fillna("").str.startswith("Dublette")]
-        aktuell = {verfahrens_id(z): z for z in behalten.to_dict("records")}
+        schluessel = list(verfahrens_ids(behalten))
+        aktuell = dict(zip(schluessel, behalten.to_dict("records")))
 
         # 1. Vorhandene Zeilen aktualisieren
         vorhanden, hoechste_id = set(), 0
@@ -131,15 +126,14 @@ class UebersichtAbgleich:
             self._zeile_schreiben(ws, kopf, zeile_nr, werte, neu_angelegt=False)
 
         # 2. Neue relevante Ausschreibungen unten anfügen, nach Frist sortiert, mit fester interner ID
-        ist_neu = [z["Ergebnis"] == "relevant" and verfahrens_id(z) not in vorhanden
-                   for z in behalten.to_dict("records")]
-        neue = behalten[ist_neu] if len(behalten) else behalten
+        neue = behalten.assign(_schluessel=schluessel)
+        neue = neue[(neue["Ergebnis"] == "relevant") & ~neue["_schluessel"].isin(vorhanden)]
         for z in neue.sort_values("Angebotsfrist", na_position="last").to_dict("records"):
             hoechste_id += 1
             letzte += 1
             werte = self.agent_werte(z)
             werte.update({"Ausschreibungs ID Intern": hoechste_id, "Neu": "ja",
-                          "Erstmals gefunden am": self.heute, "Verfahrens ID": verfahrens_id(z)})
+                          "Erstmals gefunden am": self.heute, "Verfahrens ID": z["_schluessel"]})
             self._zeile_schreiben(ws, kopf, letzte, werte, neu_angelegt=True)
             zahlen["neu"] += 1
 

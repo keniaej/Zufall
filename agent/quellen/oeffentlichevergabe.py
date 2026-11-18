@@ -5,15 +5,14 @@ Braucht keinen API-Key. Es gibt keine Suche, nur Gesamtexporte pro Monat oder Ta
 2. Für die Treffer die eForms-XML aus dem Monatsexport laden (Frist, E-Mail, Straße, Link)
 """
 import io
-import time
 import xml.etree.ElementTree as ET
 import zipfile
 
 import pandas as pd
-import requests
 
 from agent.kriterien import cpv_passt
 from agent.modell import SPALTEN
+from agent.netz import abrufen
 from agent.quellen.basis import Quelle
 from agent.werte import datum, fristart_waehlen, land, laufzeit, vergabeart
 
@@ -92,15 +91,8 @@ class OeffentlicheVergabeQuelle(Quelle):
 
     def download(self, parameter):
         """Lädt ein ZIP. Bis zu 3 Versuche, die Seite bricht gelegentlich ab."""
-        for versuch in range(3):
-            try:
-                antwort = requests.get(self.URL, params=parameter, timeout=600)   # Monats-ZIPs: bis ca. 100 MB
-                antwort.raise_for_status()
-                return zipfile.ZipFile(io.BytesIO(antwort.content))
-            except requests.RequestException:
-                if versuch == 2:
-                    raise
-                time.sleep(10)
+        inhalt = abrufen(self.URL, parameter=parameter, timeout=600, versuche=3)   # Monats-ZIPs: bis ca. 100 MB
+        return zipfile.ZipFile(io.BytesIO(inhalt))
 
     def monate(self):
         """Alle Monate vom Startdatum bis heute, z. B. ['2026-08', '2026-09', ...]."""

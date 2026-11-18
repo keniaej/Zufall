@@ -1,6 +1,3 @@
-requests>=2.31
+# Was der Agent zum Laufen braucht (installiert "Agent starten.bat" automatisch)
 pandas>=2.0
 openpyxl>=3.1
-python-dotenv>=1.0
-pytest>=8.0
-jupyter

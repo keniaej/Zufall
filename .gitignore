@@ -17,7 +17,8 @@ venv/
 *.egg-info/
 
 # Editor / Betriebssystem
-.vscode/
+.vscode/*
+!.vscode/launch.json
 .idea/
 .DS_Store
 Thumbs.db

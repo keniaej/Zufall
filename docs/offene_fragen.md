@@ -7,7 +7,7 @@ Erledigtes einfach abhaken: `- [x]`
 ### Technik
 - [x] **Wo läuft das Skript?** Entscheidung 17.11.2026: unter Windows, manuell per Doppelklick auf `Agent starten.bat` (lokal, nicht über Google Colab). Offen bleibt, auf welchem Rechner es nach Projektende bei ZUFALL läuft.
 - [ ] **NSPA (Nato):** wahrscheinlich nicht machbar, da keine öffentliche API. Mit ZUFALL besprechen.
-- [x] **Feste Regeln für Dopplungen:** gleiche Verfahrens-ID = gleiche Ausschreibung, die neueste Fassung bleibt, „Gefunden auf“ nennt alle Plattformen. Bei TED und öffentlichevergabe.de kam keine Bekanntmachung ohne Verfahrens-ID an. Für künftige Quellen ohne ID (z. B. Service.Bund) wäre eine Zusatzregel nötig (Auftraggeber + Frist + ähnlicher Titel).
+- [x] **Feste Regeln für Dopplungen:** gleiche Verfahrens-ID = gleiche Ausschreibung, die neueste Fassung bleibt (am selben Tag die TED-Fassung), „Gefunden auf“ nennt alle Plattformen. Bei TED und öffentlichevergabe.de kam keine Bekanntmachung ohne Verfahrens-ID an. Für künftige Quellen ohne ID (z. B. Service.Bund) wäre eine Zusatzregel nötig (Auftraggeber + Frist + ähnlicher Titel).
 - [x] **Spalte Timestamp:** umgesetzt als „Erstmals gefunden am“, „Zuletzt aktualisiert am“ und „Neu“ in der Übersicht.
 - [x] **Ändert sich die Ausschreibungs-ID** bei Änderungen? Bei TED ja (neue Bekanntmachungsnummer). Deshalb laufen Dubletten und Abgleich über die Verfahrens-ID.
   Hinweis: Der Code unterscheidet schon zwischen *Ausschreibungs ID Platform* (pro Bekanntmachung) und *Verfahrens ID* (pro Vergabeverfahren). Die Dubletten-Prüfung behält pro Verfahrens ID die neueste Bekanntmachung.

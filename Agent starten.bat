@@ -46,7 +46,7 @@ if errorlevel 1 (
 )
 
 :pakete_pruefen
-"%VENV_PY%" -c "import pandas, openpyxl, requests" >nul 2>&1
+"%VENV_PY%" -c "import pandas, openpyxl" >nul 2>&1
 if not errorlevel 1 goto starten
 echo Pakete werden installiert ...
 "%VENV_PY%" -m pip install --disable-pip-version-check -q -r requirements.txt

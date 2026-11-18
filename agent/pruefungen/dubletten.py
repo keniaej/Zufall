@@ -6,19 +6,23 @@ class DublettenErkennung:
 
     Regel: gleiche Verfahrens-ID = gleiche Ausschreibung (TED und öffentlichevergabe.de verwenden
     dieselbe ID, getestet 03.11.2026). Behalten wird die NEUESTE Bekanntmachung, damit z. B. eine
-    verlängerte Frist gilt. Die Spalte "Gefunden auf" hält alle Plattformen fest.
+    verlängerte Frist gilt.
 
     Keine Pruefung-Unterklasse, weil sie nichts mit Grund aussortiert, sondern zusammenfasst.
     """
 
-    def entfernen(self, tabelle):
-        """-> eine Zeile pro Verfahren"""
-        tabelle = tabelle.copy()
-        # Ohne Verfahrens-ID würden sonst alle leeren Zeilen als eine Dublette gelten
-        tabelle["Verfahrens ID"] = verfahrens_ids(tabelle)
+    @staticmethod
+    def gefunden_auf(tabelle):
+        """Je Zeile alle Plattformen, auf denen dieses Verfahren vorkommt, z. B. "TED, oeffentlichevergabe.de"."""
+        schluessel = verfahrens_ids(tabelle)
+        plattformen = tabelle.groupby(schluessel)["Plattform"].agg(lambda s: ", ".join(sorted(set(s))))
+        return schluessel.map(plattformen)
 
-        plattformen = tabelle.groupby("Verfahrens ID")["Plattform"].agg(lambda s: ", ".join(sorted(set(s))))
-        tabelle["Gefunden auf"] = tabelle["Verfahrens ID"].map(plattformen)
-
-        tabelle = tabelle.sort_values("Publikation")
-        return tabelle.drop_duplicates(subset="Verfahrens ID", keep="last")
+    @staticmethod
+    def entfernen(tabelle):
+        """-> eine Zeile pro Verfahren (die neueste). Die Zeilennummern bleiben erhalten.
+        Am selben Tag auf mehreren Plattformen: Es gewinnt die Quelle, die in
+        agent/quellen/__init__.py (QUELLEN_KLASSEN) zuerst steht, also TED. So bleibt die Wahl bei jedem Lauf gleich."""
+        schluessel = verfahrens_ids(tabelle)
+        neueste_zuerst = tabelle["Publikation"].sort_values(ascending=False, kind="stable").index
+        return tabelle.loc[schluessel[neueste_zuerst].drop_duplicates(keep="first").index]

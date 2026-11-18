@@ -55,9 +55,10 @@ main.py          baut den Agenten zusammen:
    ▼
 ablauf.py        class Agent – der Ablauf eines Laufs:
                    1. jede Quelle.holen()            (TED, öffentlichevergabe.de, ...)
-                   2. DublettenErkennung.entfernen()
-                   3. jede Pruefung.pruefen()        (CPV, Region, Frist, Schlagwörter)
-                   4. ExcelBericht.schreiben()
+                   2. Zufall Produkt + Gefunden auf  (für alle Zeilen, auch Dubletten)
+                   3. DublettenErkennung.entfernen()
+                   4. jede Pruefung.pruefen()        (CPV, Region, Frist, Schlagwörter)
+                   5. ExcelBericht.schreiben()
 ```
 
 Der `Agent` kennt keine einzelne Plattform und keine einzelne Regel. Er arbeitet nur mit den **Basisklassen** `Quelle` und `Pruefung`. Eine neue Plattform oder Regel braucht deshalb keine Änderung am Ablauf.
@@ -74,6 +75,7 @@ Der `Agent` kennt keine einzelne Plattform und keine einzelne Regel. Er arbeitet
 | `kriterien.py` | **`class Kriterien`**: liest und prüft die CSV-Dateien aus `kriterien/` (Fehler mit Datei und Zeile), ordnet CPV-Codes den ZUFALL-Produkten zu. | Notebook (TEIL 1) |
 | `modell.py` | Die Liste `SPALTEN`, die jede Quelle liefern muss, und **`class LaufErgebnis`** (alles, was ein Lauf erzeugt). | Notebook (TEIL 2) |
 | `werte.py` | Kleine Hilfsfunktionen: Datum, Land, Vergabeart, Vertragsdauer, Texte bereinigen. | Notebook (TEIL 2) |
+| `netz.py` | Abrufe aus dem Internet mit der Python-Standardbibliothek (kein Zusatzpaket), mit Wiederholung bei Serverfehlern. Nutzt unter Windows Zertifikate und Proxy von Windows. | neu |
 | `quellen/basis.py` | **`class Quelle`** (Basisklasse): `abrufen()`, `umwandeln()`, `holen()`. | neu |
 | `quellen/ted.py` | **`class TedQuelle`**: TED-Search-API. | Notebook (TEIL 3) |
 | `quellen/oeffentlichevergabe.py` | **`class OeffentlicheVergabeQuelle`**: Monats-CSV + eForms-XML. | Notebook (TEIL 3) |
@@ -93,7 +95,7 @@ Der `Agent` kennt keine einzelne Plattform und keine einzelne Regel. Er arbeitet
 
 | Ordner / Datei | Was es ist | Herkunft |
 |----------------|------------|----------|
-| `notebooks/TED_API.ipynb` | Unser ursprüngliches Notebook, unverändert (Stand 04.11.2026). Zum Nachschauen und Ausprobieren. Der Agent selbst nutzt es nicht. | Notebook |
+| `notebooks/TED_API.ipynb` | Unser ursprüngliches Notebook, unverändert (Stand 04.11.2026). Zum Nachschauen und Ausprobieren. Der Agent selbst nutzt es nicht. Öffnen z. B. direkt in VS Code (Jupyter wird nicht mehr mitinstalliert). | Notebook |
 | `automatisch/README.md` | Anleitung, wie der Agent einmal im Monat von selbst läuft (Mac und Windows). | neu |
 | `automatisch/einrichten_mac.sh` | Schaltet auf dem Mac den monatlichen Lauf ein. Einmal starten mit `bash automatisch/einrichten_mac.sh`. | neu |
 | `automatisch/ausschalten_mac.sh` | Schaltet den monatlichen Lauf auf dem Mac wieder aus. | neu |
@@ -112,7 +114,8 @@ Der `Agent` kennt keine einzelne Plattform und keine einzelne Regel. Er arbeitet
 | `Agent starten.bat` | **Start unter Windows per Doppelklick.** Richtet beim ersten Mal alles ein, startet den Agenten, schreibt `output/log.txt`. |
 | `README.md` | Diese Übersicht. |
 | `CONTRIBUTING.md` | Anleitung, wie wir mit Git zusammenarbeiten (Branches, Pull Requests). |
-| `requirements.txt` | Liste der Python-Pakete. `pip install -r requirements.txt` installiert sie alle. |
+| `requirements.txt` | Pakete für den Betrieb, nur **pandas** und **openpyxl**. Installiert `Agent starten.bat` automatisch. Internetabrufe laufen über die Python-Standardbibliothek (`agent/netz.py`). |
+| `requirements-dev.txt` | Zusätzlich für die Entwicklung: **pytest** für die Tests. |
 | `.env.example` | Vorlage für API-Keys. Kopieren, in `.env` umbenennen und Keys eintragen. Aktuell braucht keine Plattform einen Key. |
 | `.gitignore` | Liste der Dateien, die Git **nie** hochlädt: `.env` mit den Keys, Excel-Dateien, die Python-Umgebung `.venv`. |
 | `.gitattributes` | Sorgt dafür, dass `Agent starten.bat` immer Windows-Zeilenenden hat (sonst funktioniert sie nicht). |
@@ -147,13 +150,13 @@ python -m venv .venv
 # Mac/Linux:
 source .venv/bin/activate
 
-# 3. Pakete installieren
-pip install -r requirements.txt
+# 3. Pakete installieren (Betrieb + Tests)
+pip install -r requirements-dev.txt
 ```
 
 ## Starten
 
-Unter Windows per Doppelklick auf `Agent starten.bat` (siehe oben). Oder im Terminal, immer aus dem Hauptordner `Zufall` und **lokal auf eurem Rechner** (nicht über Google Colab, sonst blockiert öffentlichevergabe.de die Anfrage):
+Unter Windows per Doppelklick auf `Agent starten.bat` (siehe oben). In VS Code über **Ausführen und Debuggen → „Agent starten“** (F5, eingerichtet in `.vscode/launch.json`; den Repo-Ordner `Zufall` als Ordner öffnen und den Interpreter aus `.venv` wählen). Der normale Run-Knopf auf `main.py` funktioniert **nicht** (`No module named 'agent'`). Oder im Terminal, immer aus dem Hauptordner `Zufall` und **lokal auf eurem Rechner** (nicht über Google Colab, sonst blockiert öffentlichevergabe.de die Anfrage):
 
 ```bash
 python -m agent.main
@@ -169,7 +172,7 @@ Die Datei muss beim Start **geschlossen** sein, sonst bricht der Agent sofort ab
 
 Damit der Agent **automatisch einmal im Monat** läuft, siehe [automatisch/README.md](automatisch/README.md).
 
-Tests (brauchen kein Internet):
+Tests (brauchen kein Internet, vorher einmal `pip install -r requirements-dev.txt`):
 
 ```bash
 python -m pytest

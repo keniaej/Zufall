@@ -17,7 +17,7 @@ class RegionPruefung(Pruefung):
         gruende, region = [], []
 
         for _, zeile in tabelle.iterrows():
-            produkte = [p.strip() for p in zeile["Zufall Produkt"].split(",") if p.strip()]
+            produkte = [p.strip() for p in str(zeile["Zufall Produkt"] or "").split(",") if p.strip()]
             if not any(p in region_produkte for p in produkte):
                 region.append("")
                 gruende.append(None)

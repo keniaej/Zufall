@@ -1,31 +1,25 @@
 from agent.pruefungen.basis import Pruefung
 
 
-def codes_aus_text(text):
-    """'60100000, 63120000' -> ['60100000', '63120000']"""
-    return [c.strip() for c in str(text).split(",") if c.strip()]
-
-
 class CpvPruefung(Pruefung):
-    """Ordnet das ZUFALL-Produkt zu (neue Spalte "Zufall Produkt") und sortiert aus:
-    kein ZUFALL-Code oder Hauptcode aus kriterien/ausschluss_codes.csv (z. B. Personenverkehr)."""
+    """Sortiert aus: kein ZUFALL-Code oder Hauptcode aus kriterien/ausschluss_codes.csv (z. B. Personenverkehr).
+
+    Die Spalte "Zufall Produkt" setzt der Agent gleich nach dem Abruf für alle Zeilen (auch Dubletten).
+    Fehlt sie, z. B. wenn die Prüfung allein benutzt wird, wird sie hier ergänzt."""
 
     name = "CPV-Codes"
 
     def gruende(self, tabelle):
-        gruende, produkte = [], []
-        for _, zeile in tabelle.iterrows():
-            gefunden = self.kriterien.produkte_ermitteln(codes_aus_text(zeile["Alle CPV"]))
-            produkte.append(", ".join(gefunden))
+        if "Zufall Produkt" not in tabelle.columns:
+            tabelle = tabelle.assign(**{"Zufall Produkt": tabelle["Alle CPV"].map(self.kriterien.produkt_text)})
 
-            ausschluss = self.kriterien.ausschlussgrund(zeile["Vergabe Branchen Code"])
+        gruende = []
+        for hauptcode, produkt in zip(tabelle["Vergabe Branchen Code"], tabelle["Zufall Produkt"]):
+            ausschluss = self.kriterien.ausschlussgrund(hauptcode)
             if ausschluss:
                 gruende.append(f"{ausschluss} (Hauptcode)")
-            elif not gefunden:
+            elif not produkt:
                 gruende.append("kein ZUFALL-CPV-Code")
             else:
                 gruende.append(None)
-
-        tabelle = tabelle.copy()
-        tabelle["Zufall Produkt"] = produkte
         return tabelle, gruende

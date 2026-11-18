@@ -66,6 +66,11 @@ class Kriterien:
                 gefunden.add(max(kandidaten)[1])   # längster Präfix = genauester Code
         return sorted(gefunden)
 
+    def produkt_text(self, alle_cpv):
+        """'60100000, 63120000' -> 'Kontraktlogistik, Landverkehr', leer (None) ohne ZUFALL-Code."""
+        codes = [c.strip() for c in str(alle_cpv or "").split(",") if c.strip()]
+        return ", ".join(self.produkte_ermitteln(codes)) or None
+
     def ausschlussgrund(self, hauptcode):
         """Grund aus ausschluss_codes.csv, wenn der Hauptcode darunter fällt, sonst None."""
         for code, grund in self.ausschluss_codes.items():
